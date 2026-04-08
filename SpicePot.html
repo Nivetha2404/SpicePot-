@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SpicePot Intelligence Suite | Multi-Page Analytics</title>
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* Light & Dark Theme Variables */
+        :root {
+            --bg-gradient-start: #10172b;
+            --bg-gradient-end: #1e2a3e;
+            --card-bg: rgba(30, 40, 60, 0.7);
+            --glass-border: rgba(255, 215, 120, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #cbd5e6;
+            --accent: #f9a826;
+            --accent-hover: #f97316;
+            --table-header-bg: rgba(249, 168, 38, 0.15);
+            --nav-bg: rgba(10, 15, 27, 0.8);
+            --input-bg: rgba(255, 255, 255, 0.08);
+            --input-border: rgba(255, 255, 255, 0.2);
+        }
+
+        body.light-theme {
+            --bg-gradient-start: #f0f4f8;
+            --bg-gradient-end: #e2e8f0;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(249, 168, 38, 0.4);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --input-bg: rgba(0, 0, 0, 0.05);
+            --input-border: rgba(0, 0, 0, 0.15);
+            --table-header-bg: rgba(249, 168, 38, 0.25);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* Login Page - Split Layout */
+        .login-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .login-container {
+            display: flex;
+            max-width: 1100px;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .login-form-section {
+            flex: 1;
+            padding: 2.5rem 2rem;
+        }
+
+        .login-image-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(249, 168, 38, 0.15), rgba(249, 168, 38, 0.05));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-image-section::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(249,168,38,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .login-image-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 1.5rem;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .login-image-section img:hover {
+            transform: scale(1.02);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand i {
+            font-size: 3rem;
+            color: var(--accent);
+            background: rgba(249, 168, 38, 0.2);
+            padding: 1rem;
+            border-radius: 2rem;
+        }
+
+        .brand h1 {
+            font-size: 1.8rem;
+            margin-top: 1rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFD966, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .brand p {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-size: 1rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 1.2rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(249, 168, 38, 0.4);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(95deg, var(--accent), var(--accent-hover));
+            border: none;
+            padding: 0.9rem;
+            border-radius: 1.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1e1e2f;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(249, 168, 38, 0.3);
+        }
+
+        .error-msg {
+            color: #ff9e8f;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .demo-hint {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .demo-hint span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            width: 100%;
+            max-width: 1600px;
+            margin: 20px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--nav-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-area h2 {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .nav-btn.active {
+            background: var(--accent);
+            color: #1e1e2f;
+        }
+
+        .nav-btn:hover:not(.active) {
+            background: rgba(249, 168, 38, 0.2);
+            color: var(--accent);
+        }
+
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255, 80, 80, 0.2);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            color: #ffae9e;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #ff5e5e;
+            color: white;
+        }
+
+        /* Page Content */
+        .page-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page-content.active-page {
+            display: block;
+        }
+
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(4px);
+            border-radius: 1.5rem;
+            padding: 1.2rem 1rem;
+            border-left: 5px solid var(--accent);
+        }
+
+        .kpi-card h4 {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0.5rem 0;
+        }
+
+        /* Chart Cards */
+        .insight-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            flex: 1;
+            min-width: 280px;
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 1.8rem;
+            padding: 1.2rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .chart-card h3 {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+        }
+
+        canvas {
+            max-height: 280px;
+            width: 100%;
+        }
+
+        /* Tables */
+        .table-wrapper {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 1.5rem;
+            overflow-x: auto;
+            padding: 0.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 1rem 0.8rem;
+            background: var(--table-header-bg);
+            color: var(--accent);
+        }
+
+        .data-table td {
+            padding: 0.7rem 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .badge {
+            background: var(--accent);
+            color: #1e1e2f;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        @keyframes fadeIn {
+            from { opacity: 0;}
+            to { opacity: 1;}
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 480px;
+            }
+            .login-image-section {
+                display: none;
+            }
+            .navbar { flex-direction: column; }
+            .nav-links { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN PAGE WITH SPLIT LAYOUT -->
+<div class="login-wrapper">
+    <div class="login-container">
+        <div class="login-form-section">
+            <div class="brand">
+                <i class="fas fa-utensils"></i>
+                <h1>SpicePot<br>Intelligence</h1>
+                <p>Multi-Dimensional Restaurant Analytics</p>
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <div class="input-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="loginEmail" placeholder="manager@spicepot.com" value="demo@spicepot.com">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" value="spice2024">
+                </div>
+            </div>
+            <button class="btn-login" id="doLoginBtn">
+                <i class="fas fa-sign-in-alt"></i> &nbsp; Access Dashboard
+            </button>
+            <div id="loginError" class="error-msg"></div>
+            <div class="demo-hint">
+                <i class="fas fa-info-circle"></i> Demo Credentials: <span>demo@spicepot.com</span> / <span>spice2024</span>
+            </div>
+        </div>
+        <div class="login-image-section">
+            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&h=600&fit=crop" alt="Restaurant Ambience">
+        </div>
+    </div>
+</div>
+
+<!-- DASHBOARD MAIN PANEL -->
+<div id="dashboardPage" class="dashboard-container">
+    <div class="navbar">
+        <div class="logo-area">
+            <h2><i class="fas fa-fire" style="color: var(--accent);"></i> SpicePot IQ</h2>
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn active" data-page="overview"><i class="fas fa-chart-pie"></i> Overview</button>
+            <button class="nav-btn" data-page="menu"><i class="fas fa-utensils"></i> Menu Analytics</button>
+            <button class="nav-btn" data-page="outlets"><i class="fas fa-store"></i> Outlet Performance</button>
+            <button class="nav-btn" data-page="feedback"><i class="fas fa-comment-dots"></i> Feedback Insights</button>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <button class="theme-toggle" id="themeToggleBtn"><i class="fas fa-moon"></i> Dark/Light</button>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="displayUser">Manager</span>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-power-off"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 1: OVERVIEW -->
+    <div id="page-overview" class="page-content active-page">
+        <div class="kpi-grid" id="kpiContainer"></div>
+        <div class="insight-row">
+            <div class="chart-card"><h3><i class="fas fa-star-of-life"></i> Rating Distribution</h3><canvas id="ratingChart"></canvas></div>
+            <div class="chart-card"><h3><i class="fas fa-chart-line"></i> Top 5 Revenue Items</h3><canvas id="revenueChart"></canvas></div>
+            <div class="chart-card"><h3><i class="fas fa-clock"></i> Avg Prep Time by Category</h3><canvas id="prepChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3><i class="fas fa-table-list"></i> Recent High-Value Orders</h3>
+            <div class="table-wrapper"><table class="data-table" id="insightsTable"><thead><tr><th>Order ID</th><th>Item</th><th>Total Bill</th><th>Rating</th><th>Feedback</th><th>Status</th></tr></thead><tbody id="tableBody"></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: MENU ANALYTICS -->
+    <div id="page-menu" class="page-content">
+        <div class="insight-row">
+            <div class="chart-card"><h3><i class="fas fa-chart-bar"></i> Revenue by Category</h3><canvas id="categoryRevenueChart"></canvas></div>
+            <div class="chart-card"><h3><i class="fas fa-chart-line"></i> Top Selling Items (Quantity)</h3><canvas id="topQuantityChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3><i class="fas fa-tag"></i> Menu Item Performance Matrix</h3>
+            <div class="table-wrapper"><table class="data-table" id="menuTable"><thead><tr><th>Menu Item</th><th>Category</th><th>Total Revenue</th><th>Orders Count</th><th>Avg Rating</th></tr></thead><tbody id="menuTableBody"></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- PAGE 3: OUTLET PERFORMANCE -->
+    <div id="page-outlets" class="page-content">
+        <div class="insight-row">
+            <div class="chart-card"><h3><i class="fas fa-city"></i> Revenue by Outlet City</h3><canvas id="outletRevenueChart"></canvas></div>
+            <div class="chart-card"><h3><i class="fas fa-star"></i> Average Rating by City</h3><canvas id="outletRatingChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3><i class="fas fa-store"></i> Outlet Performance Summary</h3>
+            <div class="table-wrapper"><table class="data-table" id="outletTable"><thead><tr><th>Outlet City</th><th>Total Orders</th><th>Total Revenue</th><th>Avg Rating</th><th>Completion Rate</th></tr></thead><tbody id="outletTableBody"></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: FEEDBACK INSIGHTS -->
+    <div id="page-feedback" class="page-content">
+        <div class="insight-row">
+            <div class="chart-card"><h3><i class="fas fa-smile"></i> Feedback Tag Distribution</h3><canvas id="feedbackChart"></canvas></div>
+            <div class="chart-card"><h3><i class="fas fa-chart-line"></i> Rating Trend by Feedback Type</h3><canvas id="feedbackRatingChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3><i class="fas fa-file-alt"></i> Customer Feedback Analysis</h3>
+            <div class="table-wrapper"><table class="data-table" id="feedbackTable"><thead><tr><th>Feedback Tag</th><th>Count</th><th>Avg Rating</th><th>Avg Bill (₹)</th></tr></thead><tbody id="feedbackTableBody"></tbody></table></div>
+        </div>
+    </div>
+    <footer><i class="fas fa-chart-simple"></i> SpicePot Intelligence Suite • Real-time Analytics Engine</footer>
+</div>
+
+<script>
+    // ===================== EXTENDED DATASET =====================
+    const fullOrders = [
+        { id:"ORD00001", city:"Bengaluru", item:"Ice Cream", category:"Desserts", total:639.37, rating:4.1, tag:"Value for Money", status:"Completed", prep:39, qty:1 },
+        { id:"ORD00002", city:"Hyderabad", item:"Brownie", category:"Desserts", total:658.46, rating:4.2, tag:"Ambience", status:"Completed", prep:23, qty:1 },
+        { id:"ORD00003", city:"Chennai", item:"Dal Makhani", category:"Mains", total:1764.8, rating:4.7, tag:"Service", status:"Completed", prep:20, qty:5 },
+        { id:"ORD00004", city:"Mysuru", item:"Cold Coffee", category:"Beverages", total:467.6, rating:4.1, tag:"Service", status:"Completed", prep:15, qty:2 },
+        { id:"ORD00005", city:"Hyderabad", item:"Fish Fry", category:"Starters", total:185.3, rating:2.4, tag:"Ambience", status:"Completed", prep:27, qty:2 },
+        { id:"ORD00006", city:"Bengaluru", item:"Ice Cream", category:"Desserts", total:1004.88, rating:2, tag:"Food Quality", status:"Completed", prep:15, qty:3 },
+        { id:"ORD00007", city:"Mysuru", item:"Biryani", category:"Mains", total:1337.56, rating:1.2, tag:"Food Quality", status:"Completed", prep:16, qty:4 },
+        { id:"ORD00008", city:"Mysuru", item:"Chicken 65", category:"Starters", total:994.32, rating:3.2, tag:"Service", status:"Completed", prep:38, qty:4 },
+        { id:"ORD00009", city:"Mysuru", item:"Fish Fry", category:"Starters", total:394.5, rating:3.1, tag:"Delivery", status:"Completed", prep:29, qty:3 },
+        { id:"ORD00010", city:"Mysuru", item:"Brownie", category:"Desserts", total:3113.68, rating:3.1, tag:"Delivery", status:"Completed", prep:43, qty:4 },
+        { id:"ORD00011", city:"Kochi", item:"Gulab Jamun", category:"Desserts", total:374.46, rating:3, tag:"Service", status:"Completed", prep:18, qty:2 },
+        { id:"ORD00012", city:"Coimbatore", item:"Chicken 65", category:"Starters", total:284.04, rating:3.3, tag:"Ambience", status:"Completed", prep:30, qty:4 },
+        { id:"ORD00013", city:"Coimbatore", item:"Ice Cream", category:"Desserts", total:955.8, rating:3.3, tag:"Delivery", status:"Completed", prep:40, qty:3 },
+        { id:"ORD00014", city:"Chennai", item:"Kheer", category:"Desserts", total:261.73, rating:4.7, tag:"Ambience", status:"Completed", prep:13, qty:1 },
+        { id:"ORD00015", city:"Coimbatore", item:"Grilled Fish", category:"Mains", total:969.36, rating:4.6, tag:"Delivery", status:"Completed", prep:23, qty:3 },
+        { id:"ORD00016", city:"Hyderabad", item:"Paneer Tikka", category:"Starters", total:422.88, rating:3.4, tag:"Food Quality", status:"Completed", prep:11, qty:3 },
+        { id:"ORD00017", city:"Coimbatore", item:"Butter Chicken", category:"Mains", total:2045.43, rating:2.4, tag:"Food Quality", status:"Completed", prep:39, qty:3 },
+        { id:"ORD00018", city:"Chennai", item:"Fish Fry", category:"Starters", total:1260.78, rating:2, tag:"Value for Money", status:"Completed", prep:18, qty:2 },
+        { id:"ORD00019", city:"Mysuru", item:"Ice Cream", category:"Desserts", total:1974.75, rating:3.4, tag:"Delivery", status:"Completed", prep:32, qty:5 },
+        { id:"ORD00020", city:"Hyderabad", item:"Halwa", category:"Desserts", total:2234.52, rating:4.5, tag:"Service", status:"Cancelled", prep:32, qty:3 },
+        { id:"ORD00021", city:"Kochi", item:"Fish Fry", category:"Starters", total:1746.66, rating:4.7, tag:"Delivery", status:"Completed", prep:19, qty:3 },
+        { id:"ORD00022", city:"Chennai", item:"Grilled Fish", category:"Mains", total:1393.74, rating:3.8, tag:"Delivery", status:"Completed", prep:40, qty:2 },
+        { id:"ORD00023", city:"Coimbatore", item:"Cold Coffee", category:"Beverages", total:547.84, rating:4.9, tag:"Delivery", status:"Cancelled", prep:15, qty:1 },
+        { id:"ORD00024", city:"Mysuru", item:"Paneer Butter Masala", category:"Mains", total:1177.68, rating:1.7, tag:"Value for Money", status:"Completed", prep:12, qty:2 },
+        { id:"ORD00025", city:"Bengaluru", item:"Fresh Juice", category:"Beverages", total:1291.88, rating:4.6, tag:"Service", status:"Cancelled", prep:23, qty:2 },
+        { id:"ORD00029", city:"Bengaluru", item:"Gulab Jamun", category:"Desserts", total:814.46, rating:5, tag:"Delivery", status:"Completed", prep:24, qty:2 },
+        { id:"ORD00041", city:"Coimbatore", item:"Veg Spring Roll", category:"Starters", total:2325.78, rating:5, tag:"Delivery", status:"Completed", prep:23, qty:3 },
+        { id:"ORD00060", city:"Chennai", item:"Butter Chicken", category:"Mains", total:650.08, rating:5, tag:"Service", status:"Completed", prep:26, qty:1 },
+        { id:"ORD00070", city:"Bengaluru", item:"Ice Cream", category:"Desserts", total:2395.36, rating:1.1, tag:"Food Quality", status:"Completed", prep:18, qty:4 },
+        { id:"ORD00085", city:"Mysuru", item:"Butter Chicken", category:"Mains", total:563.58, rating:4.4, tag:"Value for Money", status:"Completed", prep:34, qty:3 },
+        { id:"ORD00105", city:"Hyderabad", item:"Veg Spring Roll", category:"Starters", total:574.37, rating:4.8, tag:"Delivery", status:"Completed", prep:15, qty:1 },
+        { id:"ORD00123", city:"Hyderabad", item:"Lassi", category:"Beverages", total:476.18, rating:4.5, tag:"Ambience", status:"Completed", prep:38, qty:1 },
+        { id:"ORD00141", city:"Kochi", item:"Grilled Fish", category:"Mains", total:868.95, rating:4.7, tag:"Food Quality", status:"Completed", prep:44, qty:5 },
+        { id:"ORD00189", city:"Mysuru", item:"Halwa", category:"Desserts", total:115.26, rating:5, tag:"Food Quality", status:"Completed", prep:41, qty:2 },
+        { id:"ORD00197", city:"Bengaluru", item:"Brownie", category:"Desserts", total:1240.04, rating:4.8, tag:"Value for Money", status:"Completed", prep:38, qty:4 }
+    ];
+
+    let charts = {};
+
+    // Helper: filter completed orders
+    const completed = () => fullOrders.filter(o => o.status !== "Cancelled");
+
+    // Render Overview KPIs
+    function renderKPIs() {
+        const comp = completed();
+        const totalRev = comp.reduce((s,o)=>s+o.total,0);
+        const avgRating = (comp.reduce((s,o)=>s+o.rating,0)/comp.length).toFixed(1);
+        const totalOrders = comp.length;
+        const avgPrep = (comp.reduce((s,o)=>s+(o.prep||20),0)/comp.length).toFixed(0);
+        const topItem = [...comp].sort((a,b)=>b.total - a.total)[0]?.item || "N/A";
+        document.getElementById("kpiContainer").innerHTML = `
+            <div class="kpi-card"><h4>💰 TOTAL REVENUE</h4><div class="kpi-value">₹${totalRev.toLocaleString()}</div></div>
+            <div class="kpi-card"><h4>⭐ AVG RATING</h4><div class="kpi-value">${avgRating}/5</div></div>
+            <div class="kpi-card"><h4>📦 ORDERS</h4><div class="kpi-value">${totalOrders}</div></div>
+            <div class="kpi-card"><h4>⏱️ PREP TIME</h4><div class="kpi-value">${avgPrep} min</div></div>
+            <div class="kpi-card"><h4>🏆 TOP SELLER</h4><div class="kpi-value">${topItem}</div></div>
+        `;
+    }
+
+    function ratingDistribution(orders) {
+        let dist = {1:0,2:0,3:0,4:0,5:0};
+        orders.forEach(o=>{ let r = Math.floor(o.rating); if(r>=1 && r<=5) dist[r]++; else if(o.rating>=4.5) dist[5]++; else if(o.rating>=3.5) dist[4]++; else dist[3]++; });
+        return {labels:['1★','2★','3★','4★','5★'], data:[dist[1],dist[2],dist[3],dist[4],dist[5]]};
+    }
+
+    function topRevenueItems(orders, limit=5) {
+        let map = new Map(); orders.forEach(o=>map.set(o.item, (map.get(o.item)||0)+o.total));
+        let sorted = Array.from(map.entries()).sort((a,b)=>b[1]-a[1]).slice(0,limit);
+        return {labels:sorted.map(s=>s[0]), data:sorted.map(s=>s[1])};
+    }
+
+    function categoryPrepAvg(orders) {
+        let cats = new Map(); orders.forEach(o=>{ let c=o.category; cats.set(c, {sum:(cats.get(c)?.sum||0)+(o.prep||20), cnt:(cats.get(c)?.cnt||0)+1}); });
+        return {labels:Array.from(cats.keys()), data:Array.from(cats.values()).map(v=> (v.sum/v.cnt).toFixed(1))};
+    }
+
+    function categoryRevenue(orders) {
+        let map = new Map(); orders.forEach(o=>map.set(o.category, (map.get(o.category)||0)+o.total));
+        return {labels:Array.from(map.keys()), data:Array.from(map.values())};
+    }
+
+    function topQuantityItems(orders) {
+        let map = new Map(); orders.forEach(o=>map.set(o.item, (map.get(o.item)||0)+ (o.qty||1)));
+        let sorted = Array.from(map.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
+        return {labels:sorted.map(s=>s[0]), data:sorted.map(s=>s[1])};
+    }
+
+    function outletPerformance(orders) {
+        let outlets = new Map(); orders.forEach(o=>{ let city=o.city; if(!outlets.has(city)) outlets.set(city, {rev:0, orders:0, ratingSum:0, completed:0}); let d=outlets.get(city); d.rev+=o.total; d.orders++; d.ratingSum+=o.rating; if(o.status==="Completed") d.completed++; });
+        return Array.from(outlets.entries()).map(([city,data])=> ({city, revenue:data.rev, orders:data.orders, avgRating:(data.ratingSum/data.orders).toFixed(1), completionRate:((data.completed/data.orders)*100).toFixed(0)}));
+    }
+
+    function feedbackAnalysis(orders) {
+        let map = new Map(); orders.forEach(o=>{ let tag=o.tag||"General"; if(!map.has(tag)) map.set(tag, {count:0, ratingSum:0, billSum:0}); let d=map.get(tag); d.count++; d.ratingSum+=o.rating; d.billSum+=o.total; });
+        return Array.from(map.entries()).map(([tag,data])=> ({tag, count:data.count, avgRating:(data.ratingSum/data.count).toFixed(1), avgBill:(data.billSum/data.count).toFixed(0)}));
+    }
+
+    function renderAllPages() {
+        const comp = completed();
+        // Overview charts
+        if(charts.rating) charts.rating.destroy(); let rd = ratingDistribution(comp);
+        charts.rating = new Chart(document.getElementById("ratingChart"), { type:'bar', data:{ labels:rd.labels, datasets:[{ label:'Orders', data:rd.data, backgroundColor:'#f9a82688' }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ labels:{color:'var(--text-primary)'}} } } });
+        let revTop = topRevenueItems(comp);
+        if(charts.revenue) charts.revenue.destroy();
+        charts.revenue = new Chart(document.getElementById("revenueChart"), { type:'pie', data:{ labels:revTop.labels, datasets:[{ data:revTop.data, backgroundColor:['#FFB347','#FF8C42','#F4A261','#E9C46A','#F4D03F'] }] }, options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{color:'var(--text-primary)'}} } } });
+        let prep = categoryPrepAvg(comp);
+        if(charts.prep) charts.prep.destroy();
+        charts.prep = new Chart(document.getElementById("prepChart"), { type:'line', data:{ labels:prep.labels, datasets:[{ label:'Minutes', data:prep.data, borderColor:'#f9a826', tension:0.3 }] }, options:{ responsive:true } });
+        // Table
+        let topOrders = [...comp].sort((a,b)=>b.total-a.total).slice(0,7);
+        document.getElementById("tableBody").innerHTML = topOrders.map(o=>`<tr><td>${o.id}</td><td>${o.item}</td><td>₹${o.total.toLocaleString()}</td><td>${o.rating}</td><td><span class="badge">${o.tag||'N/A'}</span></td><td>${o.status}</td></tr>`).join('');
+        // Menu page
+        let catRev = categoryRevenue(comp);
+        if(charts.catRev) charts.catRev.destroy();
+        charts.catRev = new Chart(document.getElementById("categoryRevenueChart"), { type:'bar', data:{ labels:catRev.labels, datasets:[{ label:'Revenue (₹)', data:catRev.data, backgroundColor:'#f9a826' }] }, options:{ responsive:true } });
+        let topQty = topQuantityItems(comp);
+        if(charts.topQty) charts.topQty.destroy();
+        charts.topQty = new Chart(document.getElementById("topQuantityChart"), { type:'bar', data:{ labels:topQty.labels, datasets:[{ label:'Quantity Sold', data:topQty.data, backgroundColor:'#FFB347' }] }, options:{ responsive:true } });
+        let menuMap = new Map(); comp.forEach(o=>{ let it=o.item; if(!menuMap.has(it)) menuMap.set(it, {rev:0, cnt:0, ratingSum:0, cat:o.category}); let d=menuMap.get(it); d.rev+=o.total; d.cnt++; d.ratingSum+=o.rating; });
+        document.getElementById("menuTableBody").innerHTML = Array.from(menuMap.entries()).map(([item,data])=>`<tr><td>${item}</td><td>${data.cat}</td><td>₹${data.rev.toLocaleString()}</td><td>${data.cnt}</td><td>${(data.ratingSum/data.cnt).toFixed(1)}</td></tr>`).join('');
+        // Outlets
+        let outlets = outletPerformance(comp);
+        if(charts.outRev) charts.outRev.destroy();
+        charts.outRev = new Chart(document.getElementById("outletRevenueChart"), { type:'bar', data:{ labels:outlets.map(o=>o.city), datasets:[{ label:'Revenue (₹)', data:outlets.map(o=>o.revenue), backgroundColor:'#f9a826' }] }, options:{ responsive:true } });
+        if(charts.outRating) charts.outRating.destroy();
+        charts.outRating = new Chart(document.getElementById("outletRatingChart"), { type:'bar', data:{ labels:outlets.map(o=>o.city), datasets:[{ label:'Avg Rating', data:outlets.map(o=>parseFloat(o.avgRating)), backgroundColor:'#FFB347' }] }, options:{ responsive:true } });
+        document.getElementById("outletTableBody").innerHTML = outlets.map(o=>`<tr><td>${o.city}</td><td>${o.orders}</td><td>₹${o.revenue.toLocaleString()}</td><td>${o.avgRating}</td><td>${o.completionRate}%</td></tr>`).join('');
+        // Feedback page
+        let feedbacks = feedbackAnalysis(comp);
+        if(charts.feed) charts.feed.destroy();
+        charts.feed = new Chart(document.getElementById("feedbackChart"), { type:'pie', data:{ labels:feedbacks.map(f=>f.tag), datasets:[{ data:feedbacks.map(f=>f.count), backgroundColor:'#f9a826' }] }, options:{ responsive:true } });
+        if(charts.feedRating) charts.feedRating.destroy();
+        charts.feedRating = new Chart(document.getElementById("feedbackRatingChart"), { type:'bar', data:{ labels:feedbacks.map(f=>f.tag), datasets:[{ label:'Avg Rating', data:feedbacks.map(f=>parseFloat(f.avgRating)), backgroundColor:'#FF8C42' }] }, options:{ responsive:true } });
+        document.getElementById("feedbackTableBody").innerHTML = feedbacks.map(f=>`<tr><td>${f.tag}</td><td>${f.count}</td><td>${f.avgRating}</td><td>₹${parseInt(f.avgBill).toLocaleString()}</td></tr>`).join('');
+    }
+
+    // Page navigation & theme
+    let currentPage = "overview";
+    function switchPage(page) {
+        document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active-page'));
+        document.getElementById(`page-${page}`).classList.add('active-page');
+        document.querySelectorAll('.nav-btn').forEach(btn=>btn.classList.remove('active'));
+        document.querySelector(`.nav-btn[data-page="${page}"]`).classList.add('active');
+        currentPage = page;
+        if(page==="overview") renderKPIs();
+        renderAllPages();
+    }
+    document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>switchPage(btn.dataset.page)));
+    
+    // Theme toggling
+    let isDark = true;
+    document.getElementById("themeToggleBtn").addEventListener("click",()=>{
+        isDark = !isDark;
+        if(isDark) document.body.classList.remove('light-theme');
+        else document.body.classList.add('light-theme');
+        renderAllPages();
+    });
+    
+    // Auth
+    document.getElementById("doLoginBtn").addEventListener("click",()=>{
+        let email = document.getElementById("loginEmail").value;
+        let pwd = document.getElementById("loginPassword").value;
+        if(email==="demo@spicepot.com" && pwd==="spice2024") {
+            document.querySelector('.login-wrapper').style.display = "none";
+            document.getElementById("dashboardPage").style.display = "block";
+            document.getElementById("displayUser").innerText = "Food Director";
+            renderKPIs(); renderAllPages();
+        } else document.getElementById("loginError").innerText = "Invalid credentials";
+    });
+    document.getElementById("logoutBtn").addEventListener("click",()=>{
+        document.getElementById("dashboardPage").style.display = "none";
+        document.querySelector('.login-wrapper').style.display = "flex";
+    });
+</script>
+</body>
+</html>
